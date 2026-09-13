@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Messaging Error</title>
+</head>
+<body>
+
+    <h1>Messaging Error</h1>
+
+    <p th:text="${errorMessage}">
+        Something went wrong with the messaging service.
+    </p>
+
+    <a href="/messages">Back to Messages</a>
+
+</body>
+</html>

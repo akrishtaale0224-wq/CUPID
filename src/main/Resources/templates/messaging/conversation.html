@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Conversation</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 85%;
+            max-width: 900px;
+            margin: 40px auto;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .conversation-title {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .message {
+            border-bottom: 1px solid #ddd;
+            padding: 15px 0;
+        }
+
+        .message:last-child {
+            border-bottom: none;
+        }
+
+        .message-header {
+            font-weight: bold;
+        }
+
+        .message-content {
+            margin: 8px 0;
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .empty {
+            color: #666;
+            font-style: italic;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <h1>Conversation</h1>
+
+        <div class="conversation-title">
+            <strong th:text="${user1}">User 1</strong>
+            ↔
+            <strong th:text="${user2}">User 2</strong>
+        </div>
+
+        <div th:if="${#lists.isEmpty(conversation)}">
+            <p class="empty">
+                No conversation history found.
+            </p>
+        </div>
+
+        <div class="message"
+             th:each="message : ${conversation}">
+
+            <div class="message-header">
+                <span th:text="${message.sender}">
+                    Sender
+                </span>
+
+                →
+
+                <span th:text="${message.receiver}">
+                    Receiver
+                </span>
+            </div>
+
+            <div class="message-content"
+                 th:text="${message.content}">
+                Message content
+            </div>
+
+            <div class="message-time"
+                 th:text="${message.sentAt}">
+                Time
+            </div>
+
+        </div>
+
+        <a class="back-link" href="/messages">
+            ← Back to Messages
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>

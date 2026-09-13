@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cupid Messaging</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 85%;
+            max-width: 900px;
+            margin: 40px auto;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        label {
+            display: block;
+            margin-top: 12px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .encouragement {
+            padding: 15px;
+            border-radius: 8px;
+            background: #eeeeee;
+            text-align: center;
+        }
+
+        .message {
+            border-bottom: 1px solid #ddd;
+            padding: 15px 0;
+        }
+
+        .message:last-child {
+            border-bottom: none;
+        }
+
+        .message-header {
+            font-weight: bold;
+        }
+
+        .message-content {
+            margin: 8px 0;
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .empty {
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Cupid Messaging</h1>
+
+    <div class="card encouragement"
+         th:if="${encouragementEnabled}">
+        <strong th:text="${encouragementMessage}">
+            You have matches waiting. Start a conversation!
+        </strong>
+    </div>
+
+    <div class="card">
+
+        <h2>View Message Threads</h2>
+
+        <form action="/messages/threads" method="get">
+
+            <label>Username</label>
+
+            <input type="text"
+                   name="user"
+                   placeholder="Enter your username"
+                   required>
+
+            <button type="submit">
+                View Threads
+            </button>
+
+        </form>
+
+    </div>
+
+    <div class="card">
+
+        <h2>Send Message</h2>
+
+        <form action="/messages/send" method="post">
+
+            <label>Sender</label>
+
+            <input type="text"
+                   name="sender"
+                   placeholder="Your username"
+                   required>
+
+            <label>Receiver</label>
+
+            <input type="text"
+                   name="receiver"
+                   placeholder="Recipient username"
+                   required>
+
+            <label>Message</label>
+
+            <textarea name="content"
+                      placeholder="Write your message..."
+                      required></textarea>
+
+            <button type="submit">
+                Send Message
+            </button>
+
+        </form>
+
+    </div>
+
+    <div class="card">
+
+        <h2>Messages</h2>
+
+        <div th:if="${#lists.isEmpty(messages)}">
+            <p class="empty">
+                No messages yet.
+            </p>
+        </div>
+
+        <div class="message"
+             th:each="message : ${messages}">
+
+            <div class="message-header">
+
+                <span th:text="${message.sender}">
+                    Sender
+                </span>
+
+                →
+
+                <span th:text="${message.receiver}">
+                    Receiver
+                </span>
+
+            </div>
+
+            <div class="message-content"
+                 th:text="${message.content}">
+                Message content
+            </div>
+
+            <div class="message-time"
+                 th:text="${message.sentAt}">
+                Time
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

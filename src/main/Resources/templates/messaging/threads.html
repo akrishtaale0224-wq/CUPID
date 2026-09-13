@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Message Threads</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 85%;
+            max-width: 900px;
+            margin: 40px auto;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .thread-user {
+            display: block;
+            padding: 14px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+
+        .thread-user:hover {
+            background: #f0f0f0;
+        }
+
+        .empty {
+            color: #666;
+            font-style: italic;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <h1>Message Threads</h1>
+
+        <h2>
+            Threads for:
+            <span th:text="${user}">User</span>
+        </h2>
+
+        <div th:if="${#lists.isEmpty(threads)}">
+            <p class="empty">
+                No message threads found.
+            </p>
+        </div>
+
+        <div th:each="threadUser : ${threads}">
+
+            <a class="thread-user"
+               th:href="@{/messages/conversation(user1=${user}, user2=${threadUser})}"
+               th:text="${threadUser}">
+                Conversation Partner
+            </a>
+
+        </div>
+
+        <a class="back-link" href="/messages">
+            ← Back to Messages
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>
