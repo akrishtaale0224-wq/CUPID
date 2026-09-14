@@ -1,0 +1,88 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cupid - Discover</title>
+</head>
+
+<body>
+
+<h1> Cupid - Discover</h1>
+
+<div th:if="${candidate != null}">
+
+    <h2 th:text="${candidate.name}">User Name</h2>
+
+    <p>
+        Age:
+        <span th:text="${candidate.age}">25</span>
+    </p>
+
+    <p th:text="${candidate.bio}">
+        User biography
+    </p>
+
+    <!-- LIKE -->
+    <form action="/matching/swipe" method="post">
+
+        <input type="hidden"
+               name="currentUserId"
+               value="1">
+
+        <input type="hidden"
+               name="targetUserId"
+               th:value="${candidate.id}">
+
+        <input type="hidden"
+               name="decision"
+               value="LIKE">
+
+        <button type="submit">
+             LIKE
+        </button>
+
+    </form>
+
+    <!-- DISLIKE -->
+    <form action="/matching/swipe" method="post">
+
+        <input type="hidden"
+               name="currentUserId"
+               value="1">
+
+        <input type="hidden"
+               name="targetUserId"
+               th:value="${candidate.id}">
+
+        <input type="hidden"
+               name="decision"
+               value="DISLIKE">
+
+        <button type="submit">
+             DISLIKE
+        </button>
+
+    </form>
+
+</div>
+
+<div th:if="${candidate == null}">
+    <h2>No more profiles available.</h2>
+</div>
+
+<br>
+
+<a href="/matching/history/1">
+    View Swipe History
+</a>
+
+<br>
+
+<a href="/matching/matches/1">
+    View Matches 
+</a>
+
+</body>
+</html>
+
