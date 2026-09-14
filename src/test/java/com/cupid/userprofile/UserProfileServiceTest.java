@@ -1,139 +1,156 @@
 package com.cupid.userprofile;
 
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import com.cupid.userprofile.model.UserProfile;
+import com.cupid.userprofile.repository.UserProfileRepository;
+import com.cupid.userprofile.service.UserProfileServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.cupid.userprofile.model.UserProfile;
-import com.cupid.userprofile.service.UserProfileService;
-import com.cupid.userprofile.service.UserProfileServiceImpl;
+import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class UserProfileServiceTest {
 
+    private UserProfileRepository repository;
+    private UserProfileServiceImpl service;
 
-    private final UserProfileService service =
-            new UserProfileServiceImpl();
-
-
+    @BeforeEach
+    void setUp() {
+        repository = mock(UserProfileRepository.class);
+        service = new UserProfileServiceImpl(repository);
+    }
 
     @Test
-    void testCreateValidProfile() {
-
+    void createProfileShouldSaveValidProfile() {
 
         UserProfile profile =
-                new UserProfile(
-                        0,
-                        "John",
-                        25,
-                        "Software developer",
-                        "john.jpg"
-                );
+                new UserProfile("Akrishta", 25, "Hello", "photo.jpg");
 
+        when(repository.save(profile)).thenReturn(profile);
 
-        boolean result =
-                service.createProfile(profile);
-
+        boolean result = service.createProfile(profile);
 
         assertTrue(result);
-
+        verify(repository).save(profile);
     }
 
-
-
-
-
     @Test
-    void testRejectUnderAgeUser() {
-
+    void createProfileShouldRejectUnderageUser() {
 
         UserProfile profile =
-                new UserProfile(
-                        0,
-                        "Child User",
-                        15,
-                        "Invalid age",
-                        "child.jpg"
-                );
+                new UserProfile("Akrishta", 17, "Hello", "photo.jpg");
 
-
-        IllegalArgumentException exception =
-                assertThrows(
-                        IllegalArgumentException.class,
-                        () -> service.createProfile(profile)
-                );
-
-
-        assertNotNull(exception);
-
-        assertEquals(
-                "User must be 18 or older",
-                exception.getMessage()
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> service.createProfile(profile)
         );
 
+        verify(repository, never()).save(any());
     }
 
-
-
-
-
     @Test
-    void testRejectInvalidImageFormat() {
-
+    void createProfileShouldSanitiseInput() {
 
         UserProfile profile =
                 new UserProfile(
-                        0,
-                        "Test User",
+                        "<Akrishta>",
                         25,
-                        "Testing image",
-                        "virus.exe"
+                        "<Hello>",
+                        "photo.jpg"
                 );
 
+        when(repository.save(profile)).thenReturn(profile);
 
-        IllegalArgumentException exception =
-                assertThrows(
-                        IllegalArgumentException.class,
-                        () -> service.createProfile(profile)
-                );
+        service.createProfile(profile);
 
+        assertEquals("Akrishta", profile.getName());
+        assertEquals("Hello", profile.getBio());
+        verify(repository).save(profile);
+    }
 
-        assertNotNull(exception);
+    @Test
+    void fetchProfileShouldReturnProfile() {
 
-        assertEquals(
-                "Invalid profile picture format",
-                exception.getMessage()
+        UserProfile profile =
+                new UserProfile("Akrishta", 25, "Hello", "photo.jpg");
+
+        profile.setUserId(1);
+
+        when(repository.findById(1))
+                .thenReturn(Optional.of(profile));
+
+        Optional<UserProfile> result =
+                service.fetchProfile(1);
+
+        assertTrue(result.isPresent());
+        assertEquals("Akrishta", result.get().getName());
+    }
+
+    @Test
+    void fetchProfileShouldRejectInvalidId() {
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> service.fetchProfile(0)
         );
 
+        verify(repository, never()).findById(any());
     }
 
-
-
-
-
     @Test
-    void testInputSanitisation() {
-
+    void updateProfileShouldUpdateExistingProfile() {
 
         UserProfile profile =
-                new UserProfile(
-                        0,
-                        "<script>Test</script>",
-                        25,
-                        "<h1>Hello</h1>",
-                        "test.png"
-                );
+                new UserProfile("Akrishta", 25, "Updated", "photo.jpg");
 
+        profile.setUserId(1);
 
-        boolean result =
-                service.createProfile(profile);
+        when(repository.existsById(1)).thenReturn(true);
+        when(repository.save(profile)).thenReturn(profile);
 
+        boolean result = service.updateProfile(profile);
 
         assertTrue(result);
-
+        verify(repository).save(profile);
     }
 
+    @Test
+    void updateProfileShouldReturnFalseForMissingProfile() {
+
+        UserProfile profile =
+                new UserProfile("Akrishta", 25, "Updated", "photo.jpg");
+
+        profile.setUserId(1);
+
+        when(repository.existsById(1)).thenReturn(false);
+
+        boolean result = service.updateProfile(profile);
+
+        assertFalse(result);
+        verify(repository, never()).save(any());
+    }
+
+    @Test
+    void deleteProfileShouldDeleteExistingProfile() {
+
+        when(repository.existsById(1)).thenReturn(true);
+
+        boolean result = service.deleteProfile(1);
+
+        assertTrue(result);
+        verify(repository).deleteById(1);
+    }
+
+    @Test
+    void deleteProfileShouldReturnFalseForMissingProfile() {
+
+        when(repository.existsById(1)).thenReturn(false);
+
+        boolean result = service.deleteProfile(1);
+
+        assertFalse(result);
+        verify(repository, never()).deleteById(any());
+    }
 }

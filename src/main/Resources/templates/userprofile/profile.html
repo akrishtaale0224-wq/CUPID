@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>User Profile</title>
+</head>
+<body>
+
+    <h1>User Profile</h1>
+
+    <p><strong>ID:</strong>
+        <span th:text="${userProfile.userId}"></span>
+    </p>
+
+    <p><strong>Name:</strong>
+        <span th:text="${userProfile.name}"></span>
+    </p>
+
+    <p><strong>Age:</strong>
+        <span th:text="${userProfile.age}"></span>
+    </p>
+
+    <p><strong>Bio:</strong>
+        <span th:text="${userProfile.bio}"></span>
+    </p>
+
+    <p th:if="${userProfile.profilePicture}">
+        <strong>Profile Picture:</strong>
+        <span th:text="${userProfile.profilePicture}"></span>
+    </p>
+
+    <a th:href="@{/profile/{id}/edit(id=${userProfile.userId})}">
+        Edit Profile
+    </a>
+
+    <br><br>
+
+    <form th:action="@{/profile/{id}/delete(id=${userProfile.userId})}"
+          method="post">
+
+        <button type="submit">
+            Delete Account
+        </button>
+
+    </form>
+
+</body>
+</html>

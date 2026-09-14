@@ -1,56 +1,125 @@
 package com.cupid.userprofile.controller;
 
-
 import java.util.Optional;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.cupid.userprofile.model.UserProfile;
 import com.cupid.userprofile.service.UserProfileService;
-import com.cupid.userprofile.service.UserProfileServiceImpl;
 
-
+@Controller
+@RequestMapping("/profile")
 public class UserProfileController {
-
 
     private final UserProfileService userProfileService;
 
-
-    public UserProfileController() {
-
-        this.userProfileService =
-                new UserProfileServiceImpl();
-
+    public UserProfileController(UserProfileService userProfileService) {
+        this.userProfileService = userProfileService;
     }
 
-
-
-    public boolean createProfile(UserProfile profile) {
-
-        return userProfileService.createProfile(profile);
-
+    @GetMapping("/create")
+    public String showCreateForm(Model model) {
+        model.addAttribute("userProfile", new UserProfile());
+        return "userprofile/create";
     }
 
+    @PostMapping("/create")
+    public String createProfile(
+            @ModelAttribute("userProfile") UserProfile profile,
+            Model model) {
 
+        try {
+            userProfileService.createProfile(profile);
+            return "redirect:/profile/" + profile.getUserId();
 
-    public boolean updateProfile(UserProfile profile) {
-
-        return userProfileService.updateProfile(profile);
-
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            return "userprofile/create";
+        }
     }
 
+    @GetMapping("/{userId}")
+    public String getProfile(
+            @PathVariable int userId,
+            Model model) {
 
+        Optional<UserProfile> profile =
+                userProfileService.fetchProfile(userId);
 
-    public Optional<UserProfile> getProfile(int userId) {
+        if (profile.isEmpty()) {
+            return "userprofile/not-found";
+        }
 
-        return userProfileService.fetchProfile(userId);
+        model.addAttribute("userProfile", profile.get());
 
+        return "userprofile/profile";
     }
 
+    @GetMapping("/{userId}/edit")
+    public String showEditForm(
+            @PathVariable int userId,
+            Model model) {
 
+        Optional<UserProfile> profile =
+                userProfileService.fetchProfile(userId);
 
-    public boolean deleteProfile(int userId) {
+        if (profile.isEmpty()) {
+            return "userprofile/not-found";
+        }
 
-        return userProfileService.deleteProfile(userId);
+        model.addAttribute("userProfile", profile.get());
 
+        return "userprofile/edit";
     }
 
+    @PostMapping("/{userId}/edit")
+    public String updateProfile(
+            @PathVariable int userId,
+            @ModelAttribute("userProfile") UserProfile profile,
+            Model model) {
+
+        profile.setUserId(userId);
+
+        try {
+            boolean updated =
+                    userProfileService.updateProfile(profile);
+
+            if (!updated) {
+                return "userprofile/not-found";
+            }
+
+            return "redirect:/profile/" + userId;
+
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            return "userprofile/edit";
+        }
+    }
+
+    @PostMapping("/{userId}/delete")
+    public String deleteProfile(
+            @PathVariable int userId,
+            Model model) {
+
+        try {
+            boolean deleted =
+                    userProfileService.deleteProfile(userId);
+
+            if (!deleted) {
+                return "userprofile/not-found";
+            }
+
+            return "userprofile/deleted";
+
+        } catch (IllegalStateException e) {
+            model.addAttribute("error", e.getMessage());
+            return "userprofile/profile";
+        }
+    }
 }
