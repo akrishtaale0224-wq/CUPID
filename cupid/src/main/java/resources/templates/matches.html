@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cupid - Matches</title>
+</head>
+
+<body>
+
+<h1>Your Matches</h1>
+
+<div th:if="${matches != null and !matches.isEmpty()}">
+
+    <table border="1">
+
+        <thead>
+        <tr>
+            <th>User 1</th>
+            <th>User 2</th>
+            <th>Matched At</th>
+        </tr>
+        </thead>
+
+        <tbody>
+
+        <tr th:each="match : ${matches}">
+
+            <td th:text="${match.userOneId}">
+                1
+            </td>
+
+            <td th:text="${match.userTwoId}">
+                2
+            </td>
+
+            <td th:text="${match.createdAt}">
+                2026-09-14
+            </td>
+
+        </tr>
+
+        </tbody>
+
+    </table>
+
+</div>
+
+<div th:if="${matches == null or matches.isEmpty()}">
+
+    <h2>No matches yet.</h2>
+
+    <p>Keep discovering profiles!</p>
+
+</div>
+
+<br>
+
+<a href="/matching/discover">
+    ← Back to Discover
+</a>
+
+<br>
+
+<a href="/matching/history/1">
+    View Swipe History
+</a>
+
+</body>
+</html>
+

@@ -1,0 +1,59 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cupid - Swipe History</title>
+</head>
+
+<body>
+
+<h1> Swipe History</h1>
+
+<table border="1">
+
+    <thead>
+    <tr>
+        <th>Target User</th>
+        <th>Decision</th>
+        <th>Date</th>
+    </tr>
+    </thead>
+
+    <tbody>
+
+    <tr th:each="swipe : ${swipes}">
+
+        <td th:text="${swipe.targetUserId}">
+            2
+        </td>
+
+        <td th:text="${swipe.decision}">
+            LIKE
+        </td>
+
+        <td th:text="${swipe.createdAt}">
+            2026-09-14
+        </td>
+
+    </tr>
+
+    </tbody>
+
+</table>
+
+<br>
+
+<a href="/matching/discover">
+    ← Back to Discover
+</a>
+
+<br>
+
+<a href="/matching/matches/1">
+    View Matches 
+</a>
+
+</body>
+</html>
+
