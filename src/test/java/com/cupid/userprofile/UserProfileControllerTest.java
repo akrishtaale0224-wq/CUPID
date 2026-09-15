@@ -5,6 +5,7 @@ import com.cupid.userprofile.model.UserProfile;
 import com.cupid.userprofile.service.UserProfileService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 
@@ -28,18 +29,40 @@ class UserProfileControllerTest {
     void createProfileShouldRedirectToProfile() {
 
         UserProfile profile =
-                new UserProfile("Akrishta", 25, "Hello", "photo.jpg");
+                new UserProfile(
+                        "Akrishta",
+                        25,
+                        "Hello",
+                        "photo.jpg"
+                );
 
         profile.setUserId(1);
 
-        when(service.createProfile(profile)).thenReturn(true);
+        when(service.createProfile(profile))
+                .thenReturn(true);
+
+        MockMultipartFile picture =
+                new MockMultipartFile(
+                        "profilePicture",
+                        "photo.jpg",
+                        "image/jpeg",
+                        "test image".getBytes()
+                );
 
         Model model = new ExtendedModelMap();
 
         String result =
-                controller.createProfile(profile, model);
+                controller.createProfile(
+                        profile,
+                        picture,
+                        model
+                );
 
-        assertEquals("redirect:/profile/1", result);
+        assertEquals(
+                "redirect:/profile/1",
+                result
+        );
+
         verify(service).createProfile(profile);
     }
 
@@ -47,7 +70,12 @@ class UserProfileControllerTest {
     void getProfileShouldReturnProfilePage() {
 
         UserProfile profile =
-                new UserProfile("Akrishta", 25, "Hello", "photo.jpg");
+                new UserProfile(
+                        "Akrishta",
+                        25,
+                        "Hello",
+                        "photo.jpg"
+                );
 
         profile.setUserId(1);
 
@@ -57,10 +85,20 @@ class UserProfileControllerTest {
         Model model = new ExtendedModelMap();
 
         String result =
-                controller.getProfile(1, model);
+                controller.getProfile(
+                        1,
+                        model
+                );
 
-        assertEquals("userprofile/profile", result);
-        assertEquals(profile, model.getAttribute("userProfile"));
+        assertEquals(
+                "userprofile/profile",
+                result
+        );
+
+        assertEquals(
+                profile,
+                model.getAttribute("userProfile")
+        );
     }
 
     @Test
@@ -72,26 +110,50 @@ class UserProfileControllerTest {
         Model model = new ExtendedModelMap();
 
         String result =
-                controller.getProfile(999, model);
+                controller.getProfile(
+                        999,
+                        model
+                );
 
-        assertEquals("userprofile/not-found", result);
+        assertEquals(
+                "userprofile/not-found",
+                result
+        );
     }
 
     @Test
     void updateProfileShouldRedirectToProfile() {
 
         UserProfile profile =
-                new UserProfile("Akrishta", 25, "Updated", "photo.jpg");
+                new UserProfile(
+                        "Akrishta",
+                        25,
+                        "Updated",
+                        "photo.jpg"
+                );
 
-        when(service.updateProfile(profile)).thenReturn(true);
+        when(service.updateProfile(profile))
+                .thenReturn(true);
 
         Model model = new ExtendedModelMap();
 
         String result =
-                controller.updateProfile(1, profile, model);
+                controller.updateProfile(
+                        1,
+                        profile,
+                        model
+                );
 
-        assertEquals("redirect:/profile/1", result);
-        assertEquals(1, profile.getUserId());
+        assertEquals(
+                "redirect:/profile/1",
+                result
+        );
+
+        assertEquals(
+                1,
+                profile.getUserId()
+        );
+
         verify(service).updateProfile(profile);
     }
 
@@ -99,42 +161,71 @@ class UserProfileControllerTest {
     void updateProfileShouldReturnNotFound() {
 
         UserProfile profile =
-                new UserProfile("Akrishta", 25, "Updated", "photo.jpg");
+                new UserProfile(
+                        "Akrishta",
+                        25,
+                        "Updated",
+                        "photo.jpg"
+                );
 
-        when(service.updateProfile(profile)).thenReturn(false);
+        when(service.updateProfile(profile))
+                .thenReturn(false);
 
         Model model = new ExtendedModelMap();
 
         String result =
-                controller.updateProfile(999, profile, model);
+                controller.updateProfile(
+                        999,
+                        profile,
+                        model
+                );
 
-        assertEquals("userprofile/not-found", result);
+        assertEquals(
+                "userprofile/not-found",
+                result
+        );
     }
 
     @Test
     void deleteProfileShouldReturnDeletedPage() {
 
-        when(service.deleteProfile(1)).thenReturn(true);
+        when(service.deleteProfile(1))
+                .thenReturn(true);
 
         Model model = new ExtendedModelMap();
 
         String result =
-                controller.deleteProfile(1, model);
+                controller.deleteProfile(
+                        1,
+                        model
+                );
 
-        assertEquals("userprofile/deleted", result);
+        assertEquals(
+                "userprofile/deleted",
+                result
+        );
+
         verify(service).deleteProfile(1);
     }
 
     @Test
     void deleteProfileShouldReturnNotFound() {
 
-        when(service.deleteProfile(999)).thenReturn(false);
+        when(service.deleteProfile(999))
+                .thenReturn(false);
 
         Model model = new ExtendedModelMap();
 
         String result =
-                controller.deleteProfile(999, model);
+                controller.deleteProfile(
+                        999,
+                        model
+                );
 
-        assertEquals("userprofile/not-found", result);
+        assertEquals(
+                "userprofile/not-found",
+                result
+        );
     }
 }
+

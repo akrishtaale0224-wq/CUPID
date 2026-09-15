@@ -9,9 +9,13 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.cupid.userprofile.model.UserProfile;
 import com.cupid.userprofile.service.UserProfileService;
+import com.cupid.userprofile.util.ProfilePictureStorage;
+import com.cupid.userprofile.util.ProfilePictureValidator;
 
 @Controller
 @RequestMapping("/profile")
@@ -32,14 +36,43 @@ public class UserProfileController {
     @PostMapping("/create")
     public String createProfile(
             @ModelAttribute("userProfile") UserProfile profile,
+            @RequestParam(value = "pictureFile", required = false)
+            MultipartFile pictureFile,
             Model model) {
 
         try {
+            if (pictureFile != null && !pictureFile.isEmpty()) {
+
+                if (!ProfilePictureValidator.isValidImage(
+                        pictureFile.getOriginalFilename())) {
+
+                    throw new IllegalArgumentException(
+                            "Only JPG, JPEG and PNG images are allowed"
+                    );
+                }
+
+                String fileName =
+                        ProfilePictureStorage.save(pictureFile);
+
+                profile.setProfilePicture(fileName);
+            }
+
             userProfileService.createProfile(profile);
+
             return "redirect:/profile/" + profile.getUserId();
 
         } catch (IllegalArgumentException e) {
+
             model.addAttribute("error", e.getMessage());
+            return "userprofile/create";
+
+        } catch (Exception e) {
+
+            model.addAttribute(
+                    "error",
+                    "Profile picture upload failed"
+            );
+
             return "userprofile/create";
         }
     }
@@ -97,6 +130,7 @@ public class UserProfileController {
             return "redirect:/profile/" + userId;
 
         } catch (IllegalArgumentException e) {
+
             model.addAttribute("error", e.getMessage());
             return "userprofile/edit";
         }
@@ -118,6 +152,7 @@ public class UserProfileController {
             return "userprofile/deleted";
 
         } catch (IllegalStateException e) {
+
             model.addAttribute("error", e.getMessage());
             return "userprofile/profile";
         }
